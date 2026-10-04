@@ -1,0 +1,127 @@
+{
+  "personnel": [
+    {
+      "id": "P-6c6a7513",
+      "risk": "Low",
+      "days": 278,
+      "night": 1.9,
+      "tr": 2,
+      "trend": "Score: 0.02",
+      "tv": 0.02133576199412346
+    },
+    {
+      "id": "P-f7a83a5a",
+      "risk": "Low",
+      "days": 149,
+      "night": 0.9,
+      "tr": 1,
+      "trend": "Score: 0.02",
+      "tv": 0.02394203655421734
+    },
+    {
+      "id": "P-8a181e91",
+      "risk": "High",
+      "days": 526,
+      "night": 2.0,
+      "tr": 0,
+      "trend": "Score: 0.81",
+      "tv": 0.8110026121139526
+    },
+    {
+      "id": "P-6eb3b55d",
+      "risk": "Low",
+      "days": 247,
+      "night": 0.9,
+      "tr": 1,
+      "trend": "Score: 0.00",
+      "tv": 0.0020347482059150934
+    },
+    {
+      "id": "P-6a4fdcc2",
+      "risk": "Low",
+      "days": 178,
+      "night": 1.0,
+      "tr": 0,
+      "trend": "Score: 0.00",
+      "tv": 0.002381107537075877
+    },
+    {
+      "id": "P-509f0fa4",
+      "risk": "Low",
+      "days": 169,
+      "night": 0.5,
+      "tr": 0,
+      "trend": "Score: 0.00",
+      "tv": 0.0010319596622139215
+    },
+    {
+      "id": "P-5abf8b9d",
+      "risk": "Low",
+      "days": 270,
+      "night": 1.4,
+      "tr": 2,
+      "trend": "Score: 0.09",
+      "tv": 0.09214510768651962
+    },
+    {
+      "id": "P-d20fea87",
+      "risk": "Low",
+      "days": 41,
+      "night": 0.1,
+      "tr": 1,
+      "trend": "Score: 0.00",
+      "tv": 0.0038570635952055454
+    },
+    {
+      "id": "P-f9f846d8",
+      "risk": "Low",
+      "days": 234,
+      "night": 0.4,
+      "tr": 1,
+      "trend": "Score: 0.08",
+      "tv": 0.07783500105142593
+    },
+    {
+      "id": "P-80586989",
+      "risk": "High",
+      "days": 329,
+      "night": 1.6,
+      "tr": 0,
+      "trend": "Score: 0.97",
+      "tv": 0.9662855267524719
+    }
+  ],
+  "units": [
+    {
+      "name": "Unit-00",
+      "total": 4,
+      "hidden": true
+    },
+    {
+      "name": "Unit-01",
+      "total": 7,
+      "hidden": true
+    },
+    {
+      "name": "Unit-02",
+      "total": 9,
+      "hidden": true
+    },
+    {
+      "name": "Unit-03",
+      "total": 32,
+      "low": 28,
+      "medium": 2,
+      "high": 2,
+      "hidden": false
+    },
+    {
+      "name": "Unit-04",
+      "total": 90,
+      "low": 73,
+      "medium": 6,
+      "high": 11,
+      "hidden": false
+    }
+  ]
+}
