@@ -189,54 +189,52 @@ def commander_view(df):
 
 
 # ----------------------------------------------------------------------------------------------
-def main():
-    os.makedirs(OUT, exist_ok=True)
-    df = make_dataset()
-    print(f"Synthetic personnel: {len(df)} | units: {df.unit.nunique()} | "
-          f"high-stress proxy rate: {df.high_stress_proxy.mean():.0%} | self-check opt-in: {df.self_check_score.notna().mean():.0%}")
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+# Vercel looks specifically for this top-level 'app' variable
+app = FastAPI(title="Project Kavach Pipeline API")
+
+# Enable CORS so your HTML/Vercel frontend can talk to this endpoint
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def run_pipeline():
+    """Runs the Kavach synthetic pipeline and returns demo flags and commander views."""
+    df = make_dataset()
     df["rule_flag"] = rule_flags(df)
     df["model_score"] = out_of_fold_scores(df)
     df["model_flag"] = (df.model_score >= MODEL_THRESHOLD).astype(int)
-    df["final_flag"] = ((df.rule_flag == 1) | (df.model_flag == 1)).astype(int)   # rules are the safety net
+    df["final_flag"] = ((df.rule_flag == 1) | (df.model_flag == 1)).astype(int)
 
-    print("\n[Sanity check only] AUC of out-of-fold model scores on SYNTHETIC data: "
-          f"{roc_auc_score(df.high_stress_proxy, df.model_score):.2f}")
-    print("This only shows the pipeline runs, because our generator also created the labels. Do NOT quote it as accuracy.")
-    print(f"Flags: rules {df.rule_flag.sum()} | model {df.model_flag.sum()} | combined {df.final_flag.sum()} "
-          f"of {len(df)} | caught only by rules: {((df.rule_flag == 1) & (df.model_flag == 0)).sum()}")
-
-    # Final model on all data, used only to explain example flags
+    # Train model to generate SHAP reasons
     final_model = new_model().fit(df[FEATURES], df.high_stress_proxy)
-    top = df[df.final_flag == 1].sort_values("model_score", ascending=False).head(10).index
+    top = df[df.final_flag == 1].sort_values("model_score", ascending=False).head(5).index
     reasons = explain_flags(df, final_model, top)
-    ex = pd.DataFrame({
-        "pseudonym": [pseudonym(df.loc[i, "person_id"]) for i in top],
-        "unit": df.loc[top, "unit"].values,
-        "model_score": df.loc[top, "model_score"].round(2).values,
-        "rule_flag": df.loc[top, "rule_flag"].values,
-        "reasons (SHAP)": reasons,
-    })
-    ex.to_csv(f"{OUT}/example_flags.csv", index=False)
-    print("\nExample flags (pseudonymized, with reasons):")
-    for _, r in ex.head(5).iterrows():
-        print(f"  {r['pseudonym']} ({r['unit']}) score {r['model_score']} -> {r['reasons (SHAP)']}")
 
-    fair = fairness_audit(df)
-    fair.to_csv(f"{OUT}/fairness_report.csv", index=False)
-    print("\nFairness audit (recall = share of true high-stress people who were flagged):")
-    print(fair.to_string(index=False))
-    for col in fair.attribute.unique():
-        rec = fair[fair.attribute == col].iloc[:, 4]
-        if rec.max() - rec.min() > 0.10:
-            print(f"  WARNING: recall gap of {rec.max() - rec.min():.2f} across {col}. Investigate before any real use.")
+    # Prepare response payload
+    example_flags = []
+    for i, reason in zip(top, reasons):
+        example_flags.append({
+            "pseudonym": pseudonym(df.loc[i, "person_id"]),
+            "unit": str(df.loc[i, "unit"]),
+            "model_score": float(round(df.loc[i, "model_score"], 2)),
+            "rule_flag": int(df.loc[i, "rule_flag"]),
+            "reasons_shap": reason
+        })
 
     view = commander_view(df)
-    view.to_csv(f"{OUT}/commander_unit_view.csv", index=False)
-    print(f"\nCommander view (units under {MIN_GROUP} people are hidden):")
-    print(view.head(8).to_string(index=False))
-    print(f"\nFiles written to ./{OUT}/ (example_flags.csv, fairness_report.csv, commander_unit_view.csv)")
 
-
-if __name__ == "__main__":
-    main()
+    return {
+        "status": "success",
+        "total_personnel": len(df),
+        "high_stress_flagged": int(df.final_flag.sum()),
+        "example_flags": example_flags,
+        "commander_view": view.to_dict(orient="records")
+    }
