@@ -1,0 +1,39 @@
+Synthetic personnel: 1918 | units: 30 | high-stress proxy rate: 20% | self-check opt-in: 60%
+
+[Sanity check only] AUC of out-of-fold model scores on SYNTHETIC data: 0.89
+This only shows the pipeline runs, because our generator also created the labels. Do NOT quote it as accuracy.
+Flags: rules 101 | model 298 | combined 315 of 1918 | caught only by rules: 17
+
+Example flags (pseudonymized, with reasons):
+  P-57913fed (Unit-10) score 1.0 -> Self-check score: 31 / 40 | Shifts over 12 h: 4.0 per week | Days since last leave: 503
+  P-b443b94b (Unit-12) score 1.0 -> Self-check score: 23 / 40 | Shifts over 12 h: 2.9 per week | Days since last leave: 480
+  P-71974c99 (Unit-06) score 1.0 -> Self-check score: 29 / 40 | Shifts over 12 h: 2.9 per week | Days since last leave: 456
+  P-aa4483ce (Unit-22) score 0.99 -> Self-check score: 26 / 40 | Shifts over 12 h: 1.5 per week | Days since last leave: 428
+  P-4b3c5eb8 (Unit-10) score 0.99 -> Self-check score: 39 / 40 | Shifts over 12 h: 3.6 per week | Days since last leave: 423
+
+Fairness audit (recall = share of true high-stress people who were flagged):
+     attribute  group    n  flag_rate  recall (true high-stress caught)  precision (flags that were right)
+    rank_group Junior 1011      0.169                             0.585                              0.661
+    rank_group    Mid  621      0.158                             0.573                              0.724
+    rank_group Senior  286      0.161                             0.582                              0.848
+        region   East  501      0.180                             0.573                              0.656
+        region  North  484      0.155                             0.578                              0.693
+        region  South  508      0.163                             0.556                              0.723
+        region   West  425      0.158                             0.627                              0.776
+language_group Lang-1  960      0.168                             0.627                              0.720
+language_group Lang-2  579      0.168                             0.588                              0.691
+language_group Lang-3  379      0.150                             0.471                              0.702
+  WARNING: recall gap of 0.16 across language_group. Investigate before any real use.
+
+Commander view (units under 10 people are hidden):
+   unit        personnel    flagged  flag_rate
+Unit-00 suppressed (<10) suppressed suppressed
+Unit-01 suppressed (<10) suppressed suppressed
+Unit-02 suppressed (<10) suppressed suppressed
+Unit-03               32          2         6%
+Unit-04               90         11        12%
+Unit-05               80          1         1%
+Unit-06               62          7        11%
+Unit-07               61          6        10%
+
+Files written to ./outputs/ (example_flags.csv, fairness_report.csv, commander_unit_view.csv)
